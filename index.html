@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Igrzyska Plugin – Dokumentacja</title>
+<style>
+/* ====== BAZA / TŁO ====== */
+:root{
+  --gold:#ffdd59;--cyan:#00fff7;--white:#ffffff;--panel:rgba(0,0,0,.85);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--white);
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background:linear-gradient(-45deg,#667eea,#764ba2,#ff6b6b,#fbc531);
+  background-size:400% 400%;
+  animation:gradientBG 20s ease infinite;
+  overflow-x:hidden;
+}
+@keyframes gradientBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+/* ====== KONTENER ====== */
+.container{
+  max-width:1100px; margin:56px auto; padding:30px; position:relative; z-index:2;
+  background:var(--panel); border-radius:15px; box-shadow:0 15px 40px rgba(0,0,0,.6);
+}
+h1,h2,h3{margin:10px 0; text-align:center}
+h1{font-size:2.4rem; text-shadow:0 0 10px #ffd700}
+h2{font-size:1.25rem; color:var(--gold); text-shadow:0 0 8px var(--gold)}
+.section-header{font-size:1.35rem; margin:20px 0 10px; color:var(--cyan); text-shadow:0 0 5px var(--cyan)}
+.note{opacity:.9; font-size:.95rem; text-align:center; margin-top:6px}
+
+/* ====== ZAKŁADKI ====== */
+.tabs{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-bottom:16px}
+.tab{background:rgba(255,255,255,.1); border:0; padding:12px 18px; cursor:pointer; font-weight:700; border-radius:10px 10px 0 0; transition:.25s; font-size:15px}
+.tab:hover{background:rgba(255,255,255,.2)}
+.tab.active{background:rgba(255,255,255,.32)}
+.tab-content{display:none; padding:18px; background:rgba(0,0,0,.7); border-radius:0 0 15px 15px}
+.tab-content.active{display:block}
+
+/* ====== TABELE ====== */
+.table-wrap{width:100%; overflow-x:auto; border-radius:10px}
+.table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px}
+.table th,.table td{border:1px solid var(--white); padding:10px; text-align:left; vertical-align:top}
+.table th{background:rgba(255,255,255,.18)}
+.table tr:nth-child(even){background:rgba(255,255,255,.08)}
+.table tr:hover{background:rgba(255,255,255,.22)}
+.code{font-family:Consolas,Monaco,monospace}
+
+/* ====== BADGE ====== */
+.badge{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:999px;
+  font-size:.8rem;
+  font-weight:700;
+  border:2px solid;
+}
+
+/* OP – pomarańczowa */
+.badge.op{
+  color:#e84118;
+  border-color:#e84118;
+  background:transparent;
+}
+
+/* Gracz – niebieska */
+.badge.player{
+  color:#3498db;
+  border-color:#3498db;
+  background:transparent;
+}
+
+/* Lider – zielona */
+.badge.leader{
+  color:#2ecc71;
+  border-color:#2ecc71;
+  background:transparent;
+}
+
+/* ====== OBRAZKI / MODAL ====== */
+.image-section{text-align:center; margin:18px 0}
+img.zoomable{max-width:320px; width:100%; border-radius:10px; cursor:pointer; transition:.3s; border:2px solid var(--white)}
+img.zoomable:hover{transform:scale(1.05); border-color:var(--gold)}
+#imageModal{display:none; position:fixed; z-index:1000; inset:0; background:rgba(0,0,0,.9)}
+#imageModal img{display:block; max-width:92%; max-height:92%; margin:50px auto; border-radius:10px; box-shadow:0 10px 40px rgba(0,0,0,.7)}
+#imageModal span{position:absolute; top:18px; right:32px; font-size:40px; font-weight:700; cursor:pointer}
+
+/* ====== ANIMOWANE KWADRATY W TLE ====== */
+.bg-squares div{position:absolute; width:40px; height:40px; background:rgba(255,255,255,.1); animation:float 20s linear infinite; bottom:-100px; z-index:1}
+@keyframes float{0%{transform:translateY(0) rotate(0); opacity:1}100%{transform:translateY(-1200px) rotate(360deg); opacity:0}}
+
+/* ====== RWD ====== */
+@media (max-width:900px){
+  h1{font-size:1.9rem} .tab{font-size:14px; padding:10px 14px}
+}
+@media (max-width:600px){
+  .container{margin:20px 12px; padding:18px}
+  .tab{flex:1 1 calc(50% - 8px)}
+  .table{font-size:13px}
+}
+</style>
+</head>
+<body>
+<!-- TŁO -->
+<div class="bg-squares">
+  <div style="left:10%; animation-delay:0s; animation-duration:25s"></div>
+  <div style="left:22%; animation-delay:2s; animation-duration:20s"></div>
+  <div style="left:68%; animation-delay:4s; animation-duration:22s"></div>
+  <div style="left:44%; animation-delay:1s; animation-duration:18s"></div>
+  <div style="left:85%; animation-delay:3s; animation-duration:26s"></div>
+</div>
+
+<!-- GŁÓWNY PANEL -->
+<div class="container">
+  <h1>Igrzyska Plugin</h1>
+  <h2>Zakup plugin: Discord – <span class="code">zmenczonyy</span></h2>
+
+  <!-- ZAKŁADKI -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('game')">GAME CONTROL</button>
+    <button class="tab" onclick="showTab('dystrykt')">DYSTRYKT</button>
+    <button class="tab" onclick="showTab('blokowanie')">BLOKOWANIE</button>
+    <button class="tab" onclick="showTab('zrzuty')">ZRZUTY</button>
+    <button class="tab" onclick="showTab('bounty')">BOUNTY</button>
+    <button class="tab" onclick="showTab('klatki')">KLATKI & START</button>
+    <button class="tab" onclick="showTab('hologramy')">HOLOGRAMY</button>
+    <button class="tab" onclick="showTab('serca')">DODATKOWE SERCA</button>
+    <button class="tab" onclick="showTab('gm')">GAMEMODE</button>
+    <button class="tab" onclick="showTab('inne')">INNE</button>
+    <button class="tab" onclick="showTab('chat')">CHAT</button>
+    <button class="tab" onclick="showTab('antycheat')">ANTYCHEAT</button>
+  </div>
+
+  <!-- GAME CONTROL -->
+  <div id="game" class="tab-content active">
+    <h3 class="section-header">Game Control</h3>
+    <div class="table-wrap"><table class="table">
+      <tr><th>Komenda (składnia)</th><th>Uprawnienia</th><th>Opis</th></tr>
+      <tr><td class="code">/pvp &lt;on|off&gt;</td><td><span class="badge op">OP</span></td><td>Włącza lub wyłącza PvP na serwerze.</td></tr>
+      <tr><td class="code">/nether &lt;on|off&gt;</td><td><span class="badge op">OP</span></td><td>Włącza lub wyłącza dostęp do Netheru.</td></tr>
+      <tr><td class="code">/end &lt;on|off&gt;</td><td><span class="badge op">OP</span></td><td>Włącza lub wyłącza dostęp do Endu.</td></tr>
+      <tr><td class="code">/gra &lt;on|off&gt;</td><td><span class="badge op">OP</span></td><td>Globalny „freeze": stawianie/niszczenie bloków, ruch, jedzenie, łuk itp.</td></tr>
+      <tr><td class="code">/moby &lt;on|off&gt;</td><td><span class="badge op">OP</span></td><td>Włącza/wyłącza spawn wrogich mobów (nie usuwa już istniejących).</td></tr>
+      <tr><td class="code">/sloty &lt;liczba&gt;</td><td><span class="badge op">OP</span></td><td>Ustawia limit graczy; operatorzy mogą wejść nawet na pełny serwer.</td></tr>
+      <tr><td class="code">/igrzyska info</td><td><span class="badge op">OP</span></td><td>Wyświetla status: PvP, Nether, End, stan gry itd.</td></tr>
+      <tr><td class="code">/ogloszenie &lt;wiadomość&gt;</td><td><span class="badge op">OP</span></td><td>Wysyła ogłoszenie do wszystkich graczy.</td></tr>
+      <tr><td class="code">/gracz &lt;dodaj|usun&gt; &lt;nick&gt;</td><td><span class="badge op">OP</span></td><td>Zarządza listą graczy dopuszczonych przy <span class="code">/wejscie gracz</span>.</td></tr>
+      <tr><td class="code">/lider &lt;dodaj|usun&gt; &lt;nick&gt;</td><td><span class="badge op">OP</span></td><td>Zarządza listą liderów (dla trybu <span class="code">/wejscie lider</span>).</td></tr>
+      <tr>
+  <td class="code">/wejscie &lt;wlacz|wylacz|gracz|lider&gt;</td>
+  <td><span class="badge op">OP</span></td>
+  <td><b>wlacz</b> – wszyscy mogą wejść. <b>wylacz</b> – tylko OP. <b>Gracz</b> – gracze z listy + liderzy + OP. <b>Lider</b> – liderzy + OP.</td>
+</tr>
+      <tr><td class="code">/igrzyska reload</td><td><span class="badge op">OP</span></td><td>Przeładowuje konfigurację z <span class="code">config.yml</span>.</td></tr>
+      <tr><td class="code">/igrzyska banposmierci &lt;on|off&gt;</td><td><span class="badge op">OP</span></td><td>Włącza/wyłącza bana po śmierci.</td></tr>
+      <tr><td class="code">/odrodz &lt;nick&gt;</td><td><span class="badge op">OP</span></td><td>Odrodzenie gracza zbanowanego po śmierci.</td></tr>
+    </table></div>
+  </div>
+
+  <!-- DYSTRYKT -->
+  <div id="dystrykt" class="tab-content">
+    <h3 class="section-header">Dystrykty</h3>
+    <p class="note">W dystrykcie maks. 4 osoby + <span class="badge leader">Lider</span>. Po zabiciu lidera dystrykt zostaje <b>eliminowany</b> (gracze nie giną, tracą jedynie dystrykt).</p>
+    <div class="table-wrap"><table class="table">
+      <tr><th>Komenda (składnia)</th><th>Uprawnienia</th><th>Opis</th></tr>
+      <tr><td class="code">/dystrykt tworzprzezgraczy &lt;on|off&gt;</td><td><span class="badge op">OP</span></td><td>Włącza możliwość tworzenia dystryktów przez graczy.</td></tr>
+      <tr><td class="code">/dystrykt stworz &lt;nazwa&gt;</td><td><span class="badge op">OP</span>/<span class="badge player">Gracz</span></td><td>OP: tworzy dystrykt o dowolnej nazwie i zostaje właścicielem. Gracz: tworzy automatycznie D1, D2, …</td></tr>
+      <tr><td class="code">/dystrykt zapros &lt;nick&gt;</td><td><span class="badge leader">Lider</span></td><td>Zaprasza gracza do dystryktu.</td></tr>
+      <tr><td class="code">/dystrykt dolacz &lt;numer&gt;</td><td><span class="badge player">Gracz</span></td><td>Dołącza do wskazanego dystryktu.</td></tr>
+      <tr><td class="code">/dystrykt pvp &lt;on|off&gt;</td><td><span class="badge leader">Lider</span></td><td>Włącza/wyłącza PvP między członkami dystryktu.</td></tr>
+      <tr><td class="code">/dystrykt wyrzuc &lt;nick&gt;</td><td><span class="badge leader">Lider</span></td><td>Usuwa gracza z dystryktu.</td></tr>
+      <tr><td class="code">/dystrykt usun &lt;nazwa&gt;</td><td><span class="badge op">OP</span></td><td>Usuwa dystrykt.</td></tr>
+      <tr><td class="code">/dystrykt info</td><td><span class="badge player">Gracz</span>/<span class="badge leader">Lider</span></td><td>Pokazuje lidera oraz liczebność dystryktu.</td></tr>
+      <tr><td class="code">/dystrykt reset</td><td><span class="badge op">OP</span></td><td>Usuwa wszystkie dystrykty.</td></tr>
+      <tr><td class="code">/dystrykt limit &lt;liczba 1–32&gt;</td><td><span class="badge op">OP</span></td><td>Ustawia maks. liczbę dystryktów (do 32).</td></tr>
+      <tr><td class="code">/dystrykt dajlider &lt;dystrykt&gt; &lt;nick&gt;</td><td><span class="badge op">OP</span></td><td>Tworzy dystrykt i nadaje wskazanemu graczowi rolę lidera.</td></tr>
+      <tr><td class="code">/dystrykt reload</td><td><span class="badge op">OP</span></td><td>Przeładowuje konfigurację z <span class="code">dystrykty.yml</span>.</td></tr>
+    </table></div>
+  </div>
+
+  <!-- BLOKOWANIE -->
+  <div id="blokowanie" class="tab-content">
+    <h3 class="section-header">Blokowanie przedmiotów i efektów</h3>
+    <div class="table-wrap"><table class="table">
+      <tr><th>Komenda (składnia)</th><th>Uprawnienia</th><th>Opis</th></tr>
+      <tr><td class="code">/zablokuj dodaj przedmiot &lt;ITEM_ID&gt;</td><td><span class="badge op">OP</span></td><td>Blokuje craft i zdobycie przedmiotu. Jeśli ktoś go zdobędzie – zostanie usunięty.</td></tr>
+      <tr><td class="code">/zablokuj usun przedmiot &lt;ITEM_ID&gt;</td><td><span class="badge op">OP</span></td><td>Odblokowuje wskazany przedmiot.</td></tr>
+      <tr><td class="code">/zablokuj efekt &lt;EFEKT&gt;</td><td><span class="badge op">OP</span></td><td>Blokuje wybrany efekt.</td></tr>
+      <tr><td class="code">/zablokuj odblokuj_efekt &lt;EFEKT&gt;</td><td><span class="badge op">OP</span></td><td>Odblokowuje wybrany efekt.</td></tr>
+      <tr><td class="code">/zablokuj lista</td><td><span class="badge op">OP</span></td><td>Wyświetla listę zablokowanych efektów.</td></tr>
+    </table></div>
+  </div>
+
+  <!-- ZRZUTY -->
+  <div id="zrzuty" class="tab-content">
+    <h3 class="section-header">Zrzuty zaopatrzenia</h3>
+    <div class="table-wrap"><table class="table">
+      <tr><th>Komenda (składnia)</th><th>Uprawnienia</th><th>Opis</th></tr>
+      <tr><td class="code">/zrzutzaopatrzenia &lt;max_odleglosc&gt;</td><td><span class="badge op">OP</span></td><td>Tworzy zrzut maksymalnie w podanej odległości od <span class="code">0 0</span> (np. <span class="code">/zrzutzaopatrzenia 1000</span>).</td></tr>
+      <tr><td class="code">/zrzutzaopatrzenia loot</td><td><span class="badge op">OP</span></td><td>Ustawia loot w beczce zrzutu.</td></tr>
+      <tr><td class="code">/zrzutzaopatrzenia anuluj</td><td><span class="badge op">OP</span></td><td>Usuwa bossbar i strukturę zrzutu.</td></tr>
+    </table></div>
+    <div class="image-section">
+      <img src="https://i.imgur.com/8qcEAEk.png" alt="Zrzut zaopatrzenia" class="zoomable" onclick="openImageModal(this.src)">
+    </div>
+  </div>
+
+  <!-- BOUNTY -->
+  <div id="bounty" class="tab-content">
+    <h3 class="section-header">Bounty – nagrody za eliminacje</h3>
+    <div class="table-wrap"><table class="table">
+      <tr><th>Komenda (składnia)</th><th>Uprawnienia</th><th>Opis</th></tr>
+      <tr><td class="code">/bounty losowo &lt;on|off&gt;</td><td><span class="badge op">OP</span></td><td>Tryb losowych celów: każdy gracz otrzymuje innego gracza (A→B, B→C, itd.).</td></tr>
+      <tr><td class="code">/bounty start</td><td><span class="badge op">OP</span></td><td>Startuje tryb bounty – każdy gracz otrzymuje cel.</td></tr>
+      <tr><td class="code">/bounty stop</td><td><span class="badge op">OP</span></td><td>Kończy tryb bounty.</td></tr>
+      <tr><td class="code">/bounty nagroda</td><td><span class="badge op">OP</span></td><td>GUI nagród do losowania (OP może dodawać własne nagrody).</td></tr>
+      <tr><td class="code">/bounty odbierz</td><td><span class="badge player">Gracz</span></td><td>Odbiera nagrodę, jeśli ekwipunek był pełny w momencie przyznania.</td></tr>
+    </table></div>
+  </div>
+
+  <!-- KLATKI & START -->
+  <div id="klatki" class="tab-content">
+    <h3 class="section-header">Klatki & Start rozgrywki</h3>
+    <div class="table-wrap"><table class="table">
+      <tr><th>Komenda (składnia)</th><th>Uprawnienia</th><th>Opis</th></tr>
+      <tr><td class="code">/klatka stworz &lt;nazwa&gt;</td><td><span class="badge op">OP</span></td><td>Tworzy klatkę startową – miejsce pojawiania się graczy.</td></tr>
+      <tr><td class="code">/klatka usun &lt;nazwa&gt;</td><td><span class="badge op">OP</span></td><td>Usuwa klatkę.</td></tr>
+      <tr><td class="code">/klatka tp &lt;nick|@a&gt;</td><td><span class="badge op">OP</span></td><td>Teleportuje wskazaną osobę/osoby do klatek.</td></tr>
+      <tr><td class="code">/igrzyska przygotujdostartu</td><td><span class="badge op">OP</span></td><td>Wyłącza ruch i walkę; po wejściu na serwer gracze są automatycznie teleportowani do klatek.</td></tr>
+      <tr><td class="code">/igrzyska start</td><td><span class="badge op">OP</span></td><td>Odliczanie do startu, odblokowanie ruchu, zniszczenie bloków redstone w promieniu 200 kratek od osoby wpisującej komendę. PvP włącza się automatycznie po 30 s.</td></tr>
+    </table></div>
+  </div>
+
+  <!-- HOLOGRAMY -->
+  <div id="hologramy" class="tab-content">
+    <h3 class="section-header">Hologramy legendarnych broni</h3>
+    <div class="table-wrap"><table class="table">
+      <tr><th>Komenda (składnia)</th><th>Uprawnienia</th><th>Opis</th></tr>
+      <tr><td class="code">/hologram stworz</td><td><span class="badge op">OP</span></td><td>Tworzy hologram aktualnie trzymanej broni i nadaje jej nazwę przedmiotu; hologram powoli się obraca.</td></tr>
+      <tr><td class="code">/hologram wielkosc &lt;id&gt; &lt;wartość&gt;</td><td><span class="badge op">OP</span></td><td>Zmienia wielkość obracającego się przedmiotu (hologramu).</td></tr>
+      <tr><td class="code">/hologram usun &lt;id&gt;</td><td><span class="badge op">OP</span></td><td>Usuwa wskazany hologram.</td></tr>
+      <tr><td class="code">/hologram craftingprzezgracza &lt;id&gt; &lt;nick&gt;</td><td><span class="badge op">OP</span></td><td>Ustala jedynego gracza, który może scraftować przedmiot. Jeśli brak – może każdy.</td></tr>
+      <tr><td class="code">/hologram maxcrafting &lt;id&gt; &lt;liczba&gt;</td><td><span class="badge op">OP</span></td><td>Ustala maksymalną liczbę craftów legendarnej broni.</td></tr>
+      <tr><td class="code">/hologram powiadomienia &lt;id&gt;</td><td><span class="badge op">OP</span></td><td>Włącza/wyłącza powiadomienia o scraftowaniu na czacie.</td></tr>
+      <tr><td class="code">/hologram nazwa &lt;id&gt; &lt;kolor&gt; &lt;nazwa&gt;</td><td><span class="badge op">OP</span></td><td>Zmienia nazwę legendarnej broni w hologramie.</td></tr>
+      <tr><td class="code">/hologram receptura &lt;id&gt; &lt;linijka&gt; &lt;kolor&gt; &lt;tekst&gt;</td><td><span class="badge op">OP</span></td><td>Dodaje <i>wizualną</i> recepturę (linia po linii). Służy tylko do informacji.</td></tr>
+      <tr><td class="code">/hologram ujawnij &lt;id&gt;</td><td><span class="badge op">OP</span></td><td>Ujawnia treść wpisaną komendą <span class="code">/hologram receptura</span>.</td></tr>
+      <tr><td class="code">/hologram ukryj &lt;id&gt;</td><td><span class="badge op">OP</span></td><td>Ukrywa treść receptury (wizualnej).</td></tr>
+      <tr><td class="code">/hologram prawdziwa_receptura &lt;id&gt; &lt;ITEMY&gt;</td><td><span class="badge op">OP</span></td><td>Definiuje <b>realną</b> recepturę (wymagane przedmioty do craftingu).</td></tr>
+    </table></div>
+
+    <h4 class="section-header">Przykład użycia receptur</h4>
+    <div class="table-wrap"><table class="table">
+      <tr><th>Cel</th><th>Komenda</th></tr>
+      <tr>
+        <td>Dodanie opisu wizualnej receptury</td>
+        <td class="code">/hologram receptura miecz_zlodzieja 1 szary Netherytowy miecz&lt;złoty&gt; x1<br>
+        /hologram receptura miecz_zlodzieja 2 szary Czaszka Czarnego Szkieleta&lt;złoty&gt; x2</td>
+      </tr>
+      <tr>
+        <td>Ustawienie realnych wymagań (crafting)</td>
+        <td class="code">/hologram prawdziwa_receptura miecz_zlodzieja NETHERITE_SWORD,WITHER_SKELETON_SKULLx2</td>
+      </tr>
+    </table></div>
+
+    <div class="image-section">
+      <img src="https://i.imgur.com/7Zy2RM1.png" alt="Hologram – przykład receptury" class="zoomable" onclick="openImageModal(this.src)">
+    </div>
+  </div>
+
+  <!-- DODATKOWE SERCA -->
+  <div id="serca" class="tab-content">
+    <h3 class="section-header">Dodatkowe serca</h3>
+    <div class="table-wrap"><table class="table">
+      <tr><th>Komenda (składnia)</th><th>Uprawnienia</th><th>Opis</th></tr>
+      <tr><td class="code">/dajserce</td><td><span class="badge op">OP</span></td><td>Dodaje jedno serce graczowi wpisującemu komendę.</td></tr>
+      <tr><td class="code">/ustawserca &lt;nick|@a&gt; &lt;ilość&gt;</td><td><span class="badge op">OP</span></td><td>Ustawia dokładną liczbę serc dla wskazanego gracza/graczy.</td></tr>
+    </table></div>
+  </div>
+
+  <!-- GAMEMODE -->
+  <div id="gm" class="tab-content">
+    <h3 class="section-header">Gamemode</h3>
+    <div class="table-wrap"><table class="table">
+      <tr><th>Komenda</th><th>Uprawnienia</th><th>Opis</th></tr>
+      <tr><td class="code">/gm0</td><td><span class="badge op">OP</span></td><td>Ustawia tryb Survival.</td></tr>
+      <tr><td class="code">/gm1</td><td><span class="badge op">OP</span></td><td>Ustawia tryb Creative.</td></tr>
+      <tr><td class="code">/gm2</td><td><span class="badge op">OP</span></td><td>Ustawia tryb Adventure.</td></tr>
+      <tr><td class="code">/gm3</td><td><span class="badge op">OP</span></td><td>Ustawia tryb Spectator.</td></tr>
+    </table></div>
+  </div>
+  <!-- INNE -->
+  <div id="inne" class="tab-content">
+    <h3 class="section-header">Inne</h3>
+    <div class="table-wrap"><table class="table">
+      <tr><th>Komenda (składnia)</th><th>Uprawnienia</th><th>Opis</th></tr>
+      <tr><td class="code">/antylogout &lt;czas&gt;</td><td><span class="badge op">OP</span></td><td>Ustawia czas trwania anty-logout.</td></tr>
+      <tr><td class="code">/backup &lt;nick&gt;</td><td><span class="badge op">OP</span></td><td>Tworzy backup gracza (GUI: przyczyna śmierci, ekwipunek itp.).</td></tr>
+      <tr><td class="code">/incognito &lt;nick&gt; &lt;nowy nick&gt;</td><td><span class="badge op">OP</span></td><td>Zmienia nick gracza na tab, chacie w komendach itp.</td></tr>
+      <tr><td class="code">/zakoncz</td><td><span class="badge op">OP</span></td><td>Odliczanie od 15 do 0 po którym wszyscy gracze bez OP zostają wyrzuceni.</td></tr>
+      <tr><td class="code">/win &lt;nick&gt;</td><td><span class="badge op">OP</span></td><td>Wystrzał fajerwerków wokół gracza i jego nick na title.</td></tr>
+      <tr><td class="code">/win dystrykt &lt;nazwa dystryktu&gt;</td><td><span class="badge op">OP</span></td><td>Wystrzał fajerwerków wokół wszystkich graczy z dystryktu i wyświetlenie nazwy dystryktu na title.</td></tr>
+      <tr><td class="code">/skin &lt;nick&gt;</td><td><span class="badge op">OP</span></td><td>Zmienia skin.</td></tr>
+      <tr><td class="code">/invsee &lt;nick&gt;</td><td><span class="badge op">OP</span></td><td>Pozwala zajrzeć do ekwipunku innego gracza i zabierać/dawać przedmioty.</td></tr>
+    </table></div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chat" class="tab-content">
+    <h3 class="section-header">Chat</h3>
+    <p class="note">Chat ma 1 sekundę cooldownu – nie można na nim spamić.</p>
+    <div class="table-wrap"><table class="table">
+      <tr><th>Komenda (składnia)</th><th>Uprawnienia</th><th>Opis</th></tr>
+      <tr><td class="code">/chat wylacz</td><td><span class="badge op">OP</span></td><td>Blokuje wysyłanie wiadomości dla graczy bez OP.</td></tr>
+      <tr><td class="code">/chat wlacz</td><td><span class="badge op">OP</span></td><td>Przestaje blokować wiadomości dla graczy bez OP.</td></tr>
+      <tr><td class="code">/chat wyczysc</td><td><span class="badge op">OP</span></td><td>Czyści chat.</td></tr>
+      <tr><td class="code">/mute &lt;nick&gt; &lt;czas&gt;</td><td><span class="badge op">OP</span></td><td>Blokuje wysyłanie wiadomości dla 1 osoby na określoną ilość czasu.</td></tr>
+    </table></div>
+  </div>
+
+  <!-- ANTYCHEAT -->
+  <div id="antycheat" class="tab-content">
+    <h3 class="section-header">Antycheat</h3>
+    <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
+      <li style="background:rgba(255,255,255,.07); border-left:3px solid var(--cyan); border-radius:8px; padding:14px 16px;">
+        <b style="color:var(--gold);">Health Indicators</b><br><br>
+        Blokuje mod <span class="code">Health Indicators</span> poprzez wysyłanie pakietów, w których każdy gracz ma 0,5 serca, a maksymalnie może mieć 1. Można wyłączyć w <span class="code">config.yml</span>.
+      </li>
+      <li style="background:rgba(255,255,255,.07); border-left:3px solid var(--cyan); border-radius:8px; padding:14px 16px;">
+        <b style="color:var(--gold);">Ekwipunek & Enchanty</b><br><br>
+        Blokuje mody pozwalające zobaczyć ile gracz ma przedmiotów w ekwipunku, ile ma użyć na przedmiotach oraz jakie ma enchanty. W cheatach wyświetlać się będzie zawsze, że gracz ma 64 przedmioty – na przedmiotach z enchantem będzie sama poświata, a każdy przedmiot ma 1 użycie. Dowolnie można zmieniać i wyłączać w <span class="code">config.yml</span>.
+      </li>
+      <li style="background:rgba(255,255,255,.07); border-left:3px solid var(--cyan); border-radius:8px; padding:14px 16px;">
+        <b style="color:var(--gold);">Xaero's Minimap</b><br><br>
+        Wyłącza mod <span class="code">Xaero's Minimap</span> gdy gracz wchodzi na serwer.
+      </li>
+    </ul>
+  </div>
+</div>
+<div id="imageModal"><span onclick="closeImageModal()">&times;</span><img id="modalImage" src=""></div>
+
+<script>
+function showTab(id){
+  const tabs=[...document.querySelectorAll('.tab')];
+  const views=[...document.querySelectorAll('.tab-content')];
+  tabs.forEach(t=>t.classList.remove('active'));
+  views.forEach(v=>v.classList.remove('active'));
+  document.querySelector(`[onclick="showTab('${id}')"]`).classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+function openImageModal(src){document.getElementById('modalImage').src=src;document.getElementById('imageModal').style.display='block'}
+function closeImageModal(){document.getElementById('imageModal').style.display='none'}
+</script>
+</body>
+</html>
